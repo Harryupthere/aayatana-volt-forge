@@ -1,0 +1,304 @@
+{
+  "info": {
+    "name": "Volt Forge - Admin",
+    "description": "Admin-side endpoints: manage admins & custodial wallets, plans, approve companies & applications (which triggers on-chain wallet funding + authorization), manage passport blockchain records and the transaction queue.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "adminId", "value": "1" },
+    { "key": "planId", "value": "1" },
+    { "key": "companyId", "value": "1" },
+    { "key": "applicationId", "value": "1" },
+    { "key": "walletId", "value": "1" },
+    { "key": "fundingLogId", "value": "1" },
+    { "key": "passportId", "value": "1" },
+    { "key": "passportNumber", "value": "BATT-0001" },
+    { "key": "recordId", "value": "1" },
+    { "key": "transactionId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Admins",
+      "item": [
+        { "name": "List Admins", "request": { "method": "GET", "url": "{{baseUrl}}/admins" } },
+        { "name": "Get Admin", "request": { "method": "GET", "url": "{{baseUrl}}/admins/{{adminId}}" } },
+        {
+          "name": "Create Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/admins",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Super Admin\",\n  \"email\": \"admin@volt-forge.io\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Admin",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/admins/{{adminId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Admin Name\"\n}" }
+          }
+        },
+        {
+          "name": "Import Admin Wallet (existing/funded key)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/admins/{{adminId}}/wallet/import",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"private_key\": \"0xYOUR_FUNDED_AMOY_TESTNET_PRIVATE_KEY\"\n}"
+            },
+            "description": "Import a private key you've already funded via the Polygon Amoy faucet. This wallet pays gas, funds companies, and calls owner-only contract functions."
+          }
+        },
+        {
+          "name": "Generate Admin Wallet (fresh, unfunded)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/admins/{{adminId}}/wallet/generate",
+            "description": "Creates a brand-new custodial wallet. Fund it via the Amoy faucet before it can pay gas."
+          }
+        },
+        { "name": "Delete Admin", "request": { "method": "DELETE", "url": "{{baseUrl}}/admins/{{adminId}}" } }
+      ]
+    },
+    {
+      "name": "Plans",
+      "item": [
+        { "name": "List Plans", "request": { "method": "GET", "url": "{{baseUrl}}/plans" } },
+        { "name": "List Active Plans", "request": { "method": "GET", "url": "{{baseUrl}}/plans?active=true" } },
+        { "name": "Get Plan", "request": { "method": "GET", "url": "{{baseUrl}}/plans/{{planId}}" } },
+        {
+          "name": "Create Plan",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/plans",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Starter\",\n  \"total_passports\": 100,\n  \"polygon_quantity\": \"0.05\",\n  \"status\": \"active\"\n}"
+            },
+            "description": "polygon_quantity is the amount of POL (native testnet token) transferred to a company's custodial wallet when its application on this plan is approved."
+          }
+        },
+        {
+          "name": "Update Plan",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/plans/{{planId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"inactive\"\n}" }
+          }
+        },
+        { "name": "Delete Plan", "request": { "method": "DELETE", "url": "{{baseUrl}}/plans/{{planId}}" } }
+      ]
+    },
+    {
+      "name": "Company Approvals",
+      "item": [
+        { "name": "List Companies", "request": { "method": "GET", "url": "{{baseUrl}}/companies" } },
+        { "name": "Get Company", "request": { "method": "GET", "url": "{{baseUrl}}/companies/{{companyId}}" } },
+        {
+          "name": "Approve/Reject Company (registration gate)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/companies/{{companyId}}/approve",
+            "body": { "mode": "raw", "raw": "{\n  \"is_approved\": \"yes\"\n}" }
+          }
+        },
+        {
+          "name": "Update Company Status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/companies/{{companyId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"inactive\"\n}" }
+          }
+        },
+        { "name": "Delete Company", "request": { "method": "DELETE", "url": "{{baseUrl}}/companies/{{companyId}}" } }
+      ]
+    },
+    {
+      "name": "Company Applications",
+      "item": [
+        { "name": "List Applications", "request": { "method": "GET", "url": "{{baseUrl}}/company-applications" } },
+        { "name": "Get Application", "request": { "method": "GET", "url": "{{baseUrl}}/company-applications/{{applicationId}}" } },
+        {
+          "name": "Approve Application (triggers wallet + on-chain auth)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/company-applications/{{applicationId}}/approve",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_approved\": \"yes\",\n  \"approved_by\": {{adminId}}\n}"
+            },
+            "description": "approved_by must reference an admin with a custodial wallet configured (see Admins > Import/Generate Wallet). Approving creates the company's custodial wallet (if it doesn't exist yet) and queues a 'fund_wallet' job that the blockchain worker processes: transfers the plan's polygon_quantity and calls addAuthorizedCompany on-chain."
+          }
+        },
+        {
+          "name": "Reject Application",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/company-applications/{{applicationId}}/approve",
+            "body": { "mode": "raw", "raw": "{\n  \"is_approved\": \"no\"\n}" }
+          }
+        },
+        { "name": "Delete Application", "request": { "method": "DELETE", "url": "{{baseUrl}}/company-applications/{{applicationId}}" } }
+      ]
+    },
+    {
+      "name": "Company Wallets",
+      "item": [
+        { "name": "List Wallets", "request": { "method": "GET", "url": "{{baseUrl}}/company-wallets" } },
+        { "name": "Get Wallet", "request": { "method": "GET", "url": "{{baseUrl}}/company-wallets/{{walletId}}" } },
+        { "name": "Get Wallet by Company", "request": { "method": "GET", "url": "{{baseUrl}}/company-wallets/company/{{companyId}}" } },
+        {
+          "name": "Manually Import Wallet for a Company",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/company-wallets",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": {{companyId}},\n  \"private_key\": \"0xSOME_PRIVATE_KEY\",\n  \"current_balance\": 0\n}"
+            },
+            "description": "Wallets are normally auto-created when an application is approved. Use this only to manually attach an existing key to a company."
+          }
+        },
+        {
+          "name": "Update Wallet Status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/company-wallets/{{walletId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"inactive\"\n}" }
+          }
+        },
+        { "name": "Delete Wallet", "request": { "method": "DELETE", "url": "{{baseUrl}}/company-wallets/{{walletId}}" } }
+      ]
+    },
+    {
+      "name": "Wallet Funding Logs",
+      "item": [
+        { "name": "List Funding Logs", "request": { "method": "GET", "url": "{{baseUrl}}/wallet-funding-logs" } },
+        { "name": "Get Funding Log", "request": { "method": "GET", "url": "{{baseUrl}}/wallet-funding-logs/{{fundingLogId}}" } },
+        { "name": "List Funding Logs by Company", "request": { "method": "GET", "url": "{{baseUrl}}/wallet-funding-logs/company/{{companyId}}" } },
+        {
+          "name": "Manually Log a Funding Event",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/wallet-funding-logs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": {{companyId}},\n  \"wallet_address\": \"0xWALLET1\",\n  \"amount\": \"10.5\",\n  \"transaction_hash\": \"0xTXHASH\",\n  \"funded_by\": {{adminId}},\n  \"remarks\": \"Manual top-up\"\n}"
+            },
+            "description": "Funding logs are normally created automatically by the blockchain worker after a 'fund_wallet' job completes. This endpoint is for manual/off-cycle top-ups."
+          }
+        },
+        { "name": "Delete Funding Log", "request": { "method": "DELETE", "url": "{{baseUrl}}/wallet-funding-logs/{{fundingLogId}}" } }
+      ]
+    },
+    {
+      "name": "Passports (Admin View)",
+      "item": [
+        { "name": "List All Passports", "request": { "method": "GET", "url": "{{baseUrl}}/passports" } },
+        { "name": "Get Passport", "request": { "method": "GET", "url": "{{baseUrl}}/passports/{{passportId}}" } },
+        { "name": "Delete Passport", "request": { "method": "DELETE", "url": "{{baseUrl}}/passports/{{passportId}}" } }
+      ]
+    },
+    {
+      "name": "Passport Blockchain Records",
+      "item": [
+        { "name": "List Records", "request": { "method": "GET", "url": "{{baseUrl}}/passport-blockchain-records" } },
+        { "name": "Get Record", "request": { "method": "GET", "url": "{{baseUrl}}/passport-blockchain-records/{{recordId}}" } },
+        { "name": "List Records by Passport", "request": { "method": "GET", "url": "{{baseUrl}}/passport-blockchain-records/passport/{{passportId}}" } },
+        { "name": "List Records by Company", "request": { "method": "GET", "url": "{{baseUrl}}/passport-blockchain-records/company/{{companyId}}" } },
+        {
+          "name": "Sync Record from Chain (Infura read)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/passport-blockchain-records/sync/{{passportNumber}}"
+          },
+          "description": "Reads the passport directly from the smart contract via the configured Infura RPC and reconciles the DB row with on-chain truth."
+        },
+        {
+          "name": "Manually Create Record",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/passport-blockchain-records",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": {{companyId}},\n  \"passport_id\": {{passportId}},\n  \"passport_number\": \"{{passportNumber}}\",\n  \"passport_hash\": \"0xabc123\",\n  \"issuer_wallet\": \"0xADMINWALLET\",\n  \"responsible_wallet\": \"0xWALLET1\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Record (manual override)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/passport-blockchain-records/{{recordId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"created_tx_hash\": \"0xTXHASH\",\n  \"created_block_number\": 123456,\n  \"contract_address\": \"0xCONTRACT\",\n  \"latest_public_data_hash\": \"0xHASH\"\n}"
+            }
+          }
+        },
+        { "name": "Delete Record", "request": { "method": "DELETE", "url": "{{baseUrl}}/passport-blockchain-records/{{recordId}}" } }
+      ]
+    },
+    {
+      "name": "Blockchain Transaction Queue",
+      "item": [
+        { "name": "List Transactions", "request": { "method": "GET", "url": "{{baseUrl}}/blockchain-transactions" } },
+        { "name": "List Pending Transactions", "request": { "method": "GET", "url": "{{baseUrl}}/blockchain-transactions/pending" } },
+        { "name": "Get Transaction", "request": { "method": "GET", "url": "{{baseUrl}}/blockchain-transactions/{{transactionId}}" } },
+        { "name": "List Transactions by Company", "request": { "method": "GET", "url": "{{baseUrl}}/blockchain-transactions/company/{{companyId}}" } },
+        {
+          "name": "Process Transaction Now",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/blockchain-transactions/{{transactionId}}/process"
+          },
+          "description": "Dev/admin convenience: process this one queued job immediately instead of waiting for the background worker's next poll cycle."
+        },
+        {
+          "name": "Manually Queue Transaction",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/blockchain-transactions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": {{companyId}},\n  \"passport_id\": {{passportId}},\n  \"passport_blockchain_record_id\": {{recordId}},\n  \"transaction_type\": \"create_passport\",\n  \"payload\": { \"company_wallet_id\": {{walletId}}, \"passport_number\": \"{{passportNumber}}\", \"data_hash\": \"0x...\" }\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Transaction Status (manual override)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/blockchain-transactions/{{transactionId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"transaction_hash\": \"0xTXHASH\"\n}"
+            }
+          }
+        },
+        { "name": "Delete Transaction", "request": { "method": "DELETE", "url": "{{baseUrl}}/blockchain-transactions/{{transactionId}}" } }
+      ]
+    }
+  ]
+}
