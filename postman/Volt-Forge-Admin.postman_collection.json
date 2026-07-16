@@ -140,7 +140,7 @@
               "mode": "raw",
               "raw": "{\n  \"is_approved\": \"yes\",\n  \"approved_by\": {{adminId}}\n}"
             },
-            "description": "approved_by must reference an admin with a custodial wallet configured (see Admins > Import/Generate Wallet). Approving creates the company's custodial wallet (if it doesn't exist yet) and queues a 'fund_wallet' job that the blockchain worker processes: transfers the plan's polygon_quantity and calls addAuthorizedCompany on-chain."
+            "description": "approved_by must reference an admin with a custodial wallet configured (see Admins > Import/Generate Wallet). Approving creates the company's custodial wallet (if it doesn't exist yet) and queues two jobs, processed in order: 'add_company' (calls addAuthorizedCompany on-chain) then 'fund_wallet' (transfers the plan's polygon_quantity)."
           }
         },
         {

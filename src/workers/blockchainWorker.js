@@ -8,6 +8,18 @@ const blockchainService = require('../services/blockchain.service');
 const MAX_RETRIES = Number(process.env.BLOCKCHAIN_WORKER_MAX_RETRIES) || 3;
 const POLL_INTERVAL_MS = Number(process.env.BLOCKCHAIN_WORKER_INTERVAL_MS) || 10000;
 
+// Owner-only on-chain call: whitelists the company's wallet via addAuthorizedCompany.
+// Queued first (before fund_wallet) when an admin approves a company_application.
+const handleAddCompany = async (row) => {
+  const { admin_id, company_wallet_address } = row.payload;
+
+  const admin = await adminQueries.getAdminById(admin_id);
+  if (!admin || !admin.encrypted_pk) throw new Error(`Admin ${admin_id} has no custodial wallet`);
+
+  const result = await blockchainService.authorizeCompanyOnChain(admin.encrypted_pk, company_wallet_address);
+  return result.hash;
+};
+
 const handleFundWallet = async (row) => {
   const { admin_id, company_wallet_id, company_wallet_address, amount } = row.payload;
 
@@ -15,7 +27,6 @@ const handleFundWallet = async (row) => {
   if (!admin || !admin.encrypted_pk) throw new Error(`Admin ${admin_id} has no custodial wallet`);
 
   const fundResult = await blockchainService.fundCompanyWallet(admin.encrypted_pk, company_wallet_address, amount);
-  const authResult = await blockchainService.authorizeCompanyOnChain(admin.encrypted_pk, company_wallet_address);
 
   await companyWalletQueries.adjustBalance(company_wallet_id, amount);
   await walletFundingLogQueries.createFundingLog({
@@ -24,7 +35,7 @@ const handleFundWallet = async (row) => {
     amount,
     transaction_hash: fundResult.hash,
     funded_by: admin_id,
-    remarks: `Auto-funded on application approval. Company authorized on-chain (tx: ${authResult.hash})`,
+    remarks: 'Auto-funded on application approval',
   });
 
   return fundResult.hash;
@@ -94,6 +105,7 @@ const handleTransferResponsibility = async (row) => {
 };
 
 const HANDLERS = {
+  add_company: handleAddCompany,
   fund_wallet: handleFundWallet,
   create_passport: handleCreatePassport,
   update_passport: handleUpdatePassport,

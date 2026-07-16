@@ -39,9 +39,10 @@ const createApplication = asyncHandler(async (req, res) => {
 });
 
 // Approving an application is the trigger point for the whole on-chain onboarding:
-// it ensures the company has a custodial wallet, then queues a 'fund_wallet' job that
-// the blockchain worker picks up to (1) transfer the plan's polygon_quantity from the
-// admin's wallet to the company's wallet and (2) call addAuthorizedCompany on-chain.
+// it ensures the company has a custodial wallet, then queues an 'add_company' job
+// (calls addAuthorizedCompany on-chain) followed by a 'fund_wallet' job (transfers the
+// plan's polygon_quantity from the admin's wallet to the company's wallet). Jobs are
+// processed in insertion order, so add_company runs first.
 const approveApplication = asyncHandler(async (req, res) => {
   const existing = await applicationQueries.getApplicationById(req.params.id);
   if (!existing) throw new ApiError(404, 'Application not found');
@@ -86,7 +87,19 @@ const approveApplication = asyncHandler(async (req, res) => {
     });
   }
 
-  const queueEntry = await queueQueries.createTransaction({
+  const addCompanyJob = await queueQueries.createTransaction({
+    company_id: company.id,
+    transaction_type: 'add_company',
+    status: 'pending',
+    payload: JSON.stringify({
+      admin_id: admin.id,
+      company_wallet_id: wallet.id,
+      company_wallet_address: wallet.wallet_address,
+      application_id: application.id,
+    }),
+  });
+
+  const fundWalletJob = await queueQueries.createTransaction({
     company_id: company.id,
     transaction_type: 'fund_wallet',
     status: 'pending',
@@ -102,8 +115,8 @@ const approveApplication = asyncHandler(async (req, res) => {
 
   return success(
     res,
-    { application, wallet, queued_job: queueEntry },
-    'Application approved. Wallet funding and on-chain authorization have been queued.'
+    { application, wallet, queued_jobs: [addCompanyJob, fundWalletJob] },
+    'Application approved. On-chain authorization and wallet funding have been queued.'
   );
 });
 

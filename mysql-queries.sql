@@ -120,7 +120,8 @@ transaction_type ENUM(
     'create_passport',
     'update_passport',
     'transfer_responsibility',
-    'fund_wallet'
+    'fund_wallet',
+     'add_company'
 ) default  'create_passport',
 payload JSON,
 status ENUM(

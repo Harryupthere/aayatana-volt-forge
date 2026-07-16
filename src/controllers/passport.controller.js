@@ -30,8 +30,8 @@ const getPassport = asyncHandler(async (req, res) => {
 // signed by the company's custodial wallet. The blockchain worker processes the queue
 // and fills in passport_blockchain_records with the resulting tx hash/block/status.
 const createPassport = asyncHandler(async (req, res) => {
-  const { company_id, passport_number, passport_hash } = req.body;
-
+  const { company_id, passport_number } = req.body;
+const passport_hash =toBytes32(passport_number)
   const company = await companyQueries.getCompanyById(company_id);
   if (!company) throw new ApiError(404, 'Company not found');
   if (company.is_approved !== 'yes') {
