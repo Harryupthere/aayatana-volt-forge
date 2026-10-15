@@ -5,15 +5,46 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:5000/api" },
-    { "key": "companyId", "value": "1" },
-    { "key": "planId", "value": "1" },
-    { "key": "applicationId", "value": "1" },
-    { "key": "walletId", "value": "1" },
-    { "key": "passportId", "value": "1" },
-    { "key": "recordId", "value": "1" },
-    { "key": "passportNumber", "value": "BATT-0001" },
-    { "key": "newResponsibleCompanyId", "value": "2" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "companyId",
+      "value": "1"
+    },
+    {
+      "key": "planId",
+      "value": "1"
+    },
+    {
+      "key": "applicationId",
+      "value": "1"
+    },
+    {
+      "key": "walletId",
+      "value": "1"
+    },
+    {
+      "key": "passportId",
+      "value": "1"
+    },
+    {
+      "key": "recordId",
+      "value": "1"
+    },
+    {
+      "key": "passportNumber",
+      "value": "BATT-0001"
+    },
+    {
+      "key": "newResponsibleCompanyId",
+      "value": "2"
+    },
+    {
+      "key": "batchId",
+      "value": "REPLACE_WITH_RETURNED_BATCH_ID"
+    }
   ],
   "item": [
     {
@@ -23,7 +54,12 @@
           "name": "Register Company",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/companies",
             "body": {
               "mode": "raw",
@@ -31,14 +67,28 @@
             }
           }
         },
-        { "name": "Get Company Profile", "request": { "method": "GET", "url": "{{baseUrl}}/companies/{{companyId}}" } },
+        {
+          "name": "Get Company Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/companies/{{companyId}}"
+          }
+        },
         {
           "name": "Update Company Profile",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/companies/{{companyId}}",
-            "body": { "mode": "raw", "raw": "{\n  \"address\": \"456 New Address Ave\"\n}" }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": \"456 New Address Ave\"\n}"
+            }
           }
         }
       ]
@@ -46,8 +96,20 @@
     {
       "name": "Plans",
       "item": [
-        { "name": "List Active Plans", "request": { "method": "GET", "url": "{{baseUrl}}/plans?active=true" } },
-        { "name": "Get Plan Details", "request": { "method": "GET", "url": "{{baseUrl}}/plans/{{planId}}" } }
+        {
+          "name": "List Active Plans",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/plans?active=true"
+          }
+        },
+        {
+          "name": "Get Plan Details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/plans/{{planId}}"
+          }
+        }
       ]
     },
     {
@@ -57,7 +119,12 @@
           "name": "Apply for a Plan",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/company-applications",
             "body": {
               "mode": "raw",
@@ -65,15 +132,39 @@
             }
           }
         },
-        { "name": "List My Applications", "request": { "method": "GET", "url": "{{baseUrl}}/company-applications/company/{{companyId}}" } },
-        { "name": "Get Application Details", "request": { "method": "GET", "url": "{{baseUrl}}/company-applications/{{applicationId}}" } }
+        {
+          "name": "List My Applications",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/company-applications/company/{{companyId}}"
+          }
+        },
+        {
+          "name": "Get Application Details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/company-applications/{{applicationId}}"
+          }
+        }
       ]
     },
     {
       "name": "Wallet",
       "item": [
-        { "name": "Get My Wallet", "request": { "method": "GET", "url": "{{baseUrl}}/company-wallets/company/{{companyId}}" } },
-        { "name": "List My Funding History", "request": { "method": "GET", "url": "{{baseUrl}}/wallet-funding-logs/company/{{companyId}}" } }
+        {
+          "name": "Get My Wallet",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/company-wallets/company/{{companyId}}"
+          }
+        },
+        {
+          "name": "List My Funding History",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/wallet-funding-logs/company/{{companyId}}"
+          }
+        }
       ]
     },
     {
@@ -83,7 +174,12 @@
           "name": "Create Passport (queues on-chain createPassport)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/passports",
             "body": {
               "mode": "raw",
@@ -92,10 +188,34 @@
             "description": "Requires: company is_approved='yes', an active custodial wallet, an approved plan application, and remaining passport quota. Creates the passport + a pending passport_blockchain_records row, and queues a 'create_passport' job for the blockchain worker."
           }
         },
-        { "name": "List My Passports", "request": { "method": "GET", "url": "{{baseUrl}}/passports/company/{{companyId}}" } },
-        { "name": "Get Passport Details", "request": { "method": "GET", "url": "{{baseUrl}}/passports/{{passportId}}" } },
-        { "name": "List Blockchain Records for My Passport", "request": { "method": "GET", "url": "{{baseUrl}}/passport-blockchain-records/passport/{{passportId}}" } },
-        { "name": "List Blockchain Records for My Company", "request": { "method": "GET", "url": "{{baseUrl}}/passport-blockchain-records/company/{{companyId}}" } },
+        {
+          "name": "List My Passports",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/passports/company/{{companyId}}"
+          }
+        },
+        {
+          "name": "Get Passport Details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/passports/{{passportId}}"
+          }
+        },
+        {
+          "name": "List Blockchain Records for My Passport",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/passport-blockchain-records/passport/{{passportId}}"
+          }
+        },
+        {
+          "name": "List Blockchain Records for My Company",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/passport-blockchain-records/company/{{companyId}}"
+          }
+        },
         {
           "name": "Sync Passport from Chain (Infura read)",
           "request": {
@@ -108,7 +228,12 @@
           "name": "Add Lifecycle Update (queues on-chain updatePassport)",
           "request": {
             "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/passport-blockchain-records/{{recordId}}/lifecycle",
             "body": {
               "mode": "raw",
@@ -121,7 +246,12 @@
           "name": "Transfer Responsibility (queues on-chain transferResponsibility)",
           "request": {
             "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/passport-blockchain-records/{{recordId}}/transfer",
             "body": {
               "mode": "raw",
@@ -129,6 +259,52 @@
             },
             "description": "Hands the passport off to another authorized company. Both companies must already have custodial wallets."
           }
+        }
+      ]
+    },
+    {
+      "name": "Batch Passports (Merkle)",
+      "item": [
+        {
+          "name": "Create Passport Batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/passport-batches",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_id\": {{companyId}},\n  \"passports\": [\n    { \"passport_number\": \"BATCH-TEST-0001\" },\n    { \"passport_number\": \"BATCH-TEST-0002\" },\n    { \"passport_number\": \"BATCH-TEST-0003\" }\n  ]\n}"
+            },
+            "description": "Creates an off-chain batch, computes the Merkle root and proofs, and saves passport and blockchain-record rows. Use passport numbers that do not already exist. Blockchain submission is not connected until Phase 4."
+          }
+        },
+        {
+          "name": "List My Passport Batches",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/passport-batches/company/{{companyId}}"
+          }
+        },
+        {
+          "name": "Get Passport Batch",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/passport-batches/{{batchId}}"
+          },
+          "description": "Fetches batch metadata. Set batchId to the returned bytes32 batch_id, not the numeric database ID."
+        },
+        {
+          "name": "Get Batch Passports and Merkle Proofs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/passport-batches/{{batchId}}/passports"
+          },
+          "description": "Returns the batch and its passport membership, hashes, and Merkle proofs."
         }
       ]
     }
